@@ -47,4 +47,27 @@ class AuthController extends Controller
             'expires_in' => JWTAuth::factory()->getTTL() * 60
         ]);
     }
+
+    public function me()
+    {
+        return response()->json(JWTAuth::user());
+    }
+
+    public function logout() 
+    {
+        JWTAuth::invalidate(JWTAuth::getToken());
+        return response()->json([
+            'message' => 'Successfully logged out'
+        ]);
+    }
+
+    public function refresh()
+    {
+        $newToken = JWTAuth::refresh(JWTAuth::getToken());
+        return response()->json([
+            'token' => $newToken,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60
+        ]);
+    }
 }
