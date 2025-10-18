@@ -10,9 +10,31 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = Product::query();
+
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->has('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+
+        if ($request->has('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        if ($request->has('sort_by')) {
+            $direction = $request->get('sort_order', 'asc');
+            $query->orderBy($request->get('sort_by'), $direction);
+        }
+
+        $perPage = $request->get('per_page', 10);
+        $products = $query->paginate($perPage);
+
+        return response()->json($products);
     }
 
     /**
@@ -74,6 +96,13 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $product = Product::find($id);
+        if (!$product) return response()->json(['message' => 'Product not found'], 404);
+
+        $product->delete();
+
+        return response()->json([
+            'message' => 'Product deleted successfully'
+        ]);
     }
 }
