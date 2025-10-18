@@ -40,7 +40,10 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $product = Product::find($id);
+        if (!$product) return response()->json(['message' => 'Product not found'], 404);
+
+        return response()->json($product);
     }
 
     /**
@@ -48,7 +51,22 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $product = Product::find($id);
+        if (!$product) return response()->json(['message' => 'Product not found'], 404);
+
+        $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'price' => 'sometimes|required|numeric',
+            'quantity' => 'sometimes|required|integer',
+            'description' => 'nullable|string',
+        ]);
+
+        $product->update($request->all());
+
+        return response()->json([
+            'message' => 'Product updated successfully',
+            'product' => $product
+        ]);
     }
 
     /**
