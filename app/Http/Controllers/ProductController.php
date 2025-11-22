@@ -76,14 +76,14 @@ class ProductController extends Controller
         $product = Product::find($id);
         if (!$product) return response()->json(['message' => 'Product not found'], 404);
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'price' => 'sometimes|required|numeric',
             'quantity' => 'sometimes|required|integer',
             'description' => 'nullable|string',
         ]);
 
-        $product->update($request->all());
+        $product->update($validated);
 
         return response()->json([
             'message' => 'Product updated successfully',
